@@ -1,6 +1,7 @@
+import dotenv from "dotenv";
+dotenv.config(); // MUST COME FIRST
 import express from "express";
 import { dbConnection } from "./DB/DB.js";
-import dotenv from "dotenv";
 import authRouter from "./Routers/auth.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -8,7 +9,7 @@ import Message from "./Routers/Message.route.js"
 import orderRout from "./Routers/Order.route.js"
 const PORT = process.env.PORT || 3000;
 
-dotenv.config();
+
 const app = express();
 app.use(
     cors({
