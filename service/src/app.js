@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // MUST COME FIRST
+dotenv.config();
 
 import express from "express";
 import { dbConnection } from "./DB/DB.js";
@@ -10,29 +10,33 @@ import Message from "./Routers/Message.route.js";
 import orderRout from "./Routers/Order.route.js";
 
 const PORT = process.env.PORT || 3000;
-
 const app = express();
 
-// 👉 1) JSON parser FIRST (VERY IMPORTANT)
+// JSON parser
 app.use(express.json());
-
-// 👉 2) Cookie parser
 app.use(cookieParser());
 
-// 👉 3) CORS AFTER json() and cookieParser()
+// ✅ FIXED CORS
 app.use(
     cors({
-        origin: process.env.FRONT_END_URL || "https://foodie-pu74.onrender.com",
+        origin: [
+            "http://localhost:5173",                 // local frontend
+            "https://foodie-pu74.onrender.com",      // deployed frontend (change to your real domain)
+        ],
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
 
-// Optional: Allow credentials header
+// Optional but safe
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Credentials", "true");
     next();
+});
+
+// Health check for Render
+app.get("/", (req, res) => {
+    res.send("Server is running on Render!");
 });
 
 app.get("/test", (req, res) => {
@@ -46,6 +50,6 @@ app.use("/api/Order", orderRout);
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`http://localhost:${PORT}`);
+    console.log(`Server running on port: ${PORT}`);
     dbConnection();
 });

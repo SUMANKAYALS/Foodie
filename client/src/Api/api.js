@@ -11,13 +11,15 @@ const ORODER_URL = import.meta.env.VITE_ORDER_API_URL || "https://foodie-backend
 export const signup = async (data) => {
     try {
         console.log("API_URL:", API_URL);
-        console.log("Sending Data:", data);
 
-        const response = await axios.post(`${API_URL}/signup`, data, {
-            headers: {
-                "Content-Type": "application/json"
+        const response = await axios.post(
+            `${API_URL}/api/auth/signup`,
+            data,
+            {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true
             }
-        });
+        );
 
         return response.data;
     } catch (error) {
@@ -25,6 +27,7 @@ export const signup = async (data) => {
         throw error;
     }
 };
+
 
 
 export const login = async (data) => {
