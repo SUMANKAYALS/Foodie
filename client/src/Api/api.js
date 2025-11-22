@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/auth";
-const PRODUCT_URL = import.meta.env.VITE_PRODUCT_API_URL || "http://localhost:3000/api/Message";
-const ORODER_URL = import.meta.env.VITE_ORDER_API_URL || "http://localhost:3000/api/Order";
+const API_URL = import.meta.env.VITE_API_URL || "https://foodie-backend-scfg.onrender.com/api/auth";
+const PRODUCT_URL = import.meta.env.VITE_PRODUCT_API_URL || "https://foodie-backend-scfg.onrender.com/api/Message";
+const ORODER_URL = import.meta.env.VITE_ORDER_API_URL || "https://foodie-backend-scfg.onrender.com/api/Order";
 
 export const signup = async (data) => {
     try {
