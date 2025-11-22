@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import BgImage from "../assets/login2.jpg";
 import { OtpVerification, resend } from "../Api/api";
@@ -16,12 +15,12 @@ function EmailOTPVerify() {
 
     useEffect(() => {
         if (!email) {
-            alert("Email not found. Go back and sign up again.");
+            alert("Email not found. Please sign up again.");
             navigate("/signup");
         }
     }, []);
 
-    // OTP input change
+    // Handle OTP box input
     const handleChange = (value, index) => {
         if (isNaN(value)) return;
 
@@ -29,12 +28,13 @@ function EmailOTPVerify() {
         newOtp[index] = value;
         setOtp(newOtp);
 
+        // Auto-focus next input
         if (value && index < 5) {
             document.getElementById(`otp-${index + 1}`).focus();
         }
     };
 
-    // Submit OTP handler
+    // Submit OTP
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -46,22 +46,33 @@ function EmailOTPVerify() {
         }
 
         try {
-            // const res = await axios.post("http://localhost:3000/api/auth/verify-otp", {
-            //     email,
-            //     otp: finalOtp
-            // });
-
-            const resp = await OtpVerification(email, finalOtp);
+            await OtpVerification(email, finalOtp);
 
             alert("OTP Verified Successfully!");
             navigate("/login");
 
         } catch (error) {
-            alert(error.response?.data?.message || "Invalid OTP");
+            const msg = error.response?.data?.message || "Invalid OTP";
+
+            // Auto resend OTP on wrong or expired OTP
+            if (msg === "Invalid or expired OTP") {
+                await resend(email);
+
+                alert("Incorrect OTP! A new OTP has been sent.");
+
+                // Reset fields
+                setOtp(["", "", "", "", "", ""]);
+                setTimer(30);
+                setCanResend(false);
+
+                return;
+            }
+
+            alert(msg);
         }
     };
 
-    // Timer Logic
+    // Timer logic
     useEffect(() => {
         if (timer === 0) {
             setCanResend(true);
@@ -75,14 +86,11 @@ function EmailOTPVerify() {
         return () => clearInterval(countdown);
     }, [timer]);
 
-    // Resend OTP
+    // Manual resend
     const handleResend = async () => {
         if (!canResend) return;
 
         try {
-            // await axios.post("http://localhost:3000/api/auth/resend-otp", {
-            //     email
-            // });
             await resend(email);
 
             setOtp(["", "", "", "", "", ""]);
@@ -90,7 +98,7 @@ function EmailOTPVerify() {
             setCanResend(false);
 
             alert("New OTP sent!");
-        } catch (error) {
+        } catch {
             alert("Failed to resend OTP.");
         }
     };
@@ -102,12 +110,10 @@ function EmailOTPVerify() {
         >
             <div className="absolute inset-0 bg-black/60"></div>
 
-            <div className="relative z-10 bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-[90%] max-w-md text-center 
-                animate-[fadeScale_0.7s_ease-out] text-white">
+            <div className="relative z-10 bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl 
+                w-[90%] max-w-md text-center text-white animate-[fadeScale_0.7s_ease-out]">
 
-                <h1 className="text-3xl font-bold mb-3 drop-shadow-lg">
-                    Email Verification
-                </h1>
+                <h1 className="text-3xl font-bold mb-3 drop-shadow-lg">Email Verification</h1>
 
                 <p className="text-gray-200 mb-6">
                     Enter the 6-digit OTP sent to <b>{email}</b>.
@@ -123,8 +129,8 @@ function EmailOTPVerify() {
                                 value={val}
                                 onChange={(e) => handleChange(e.target.value, i)}
                                 className="w-12 h-12 text-2xl text-center font-semibold 
-                                    bg-white/20 backdrop-blur-md border border-white/30 rounded-xl
-                                    focus:outline-none focus:border-orange-500 focus:shadow-lg transition"
+                                bg-white/20 backdrop-blur-md border border-white/30 rounded-xl
+                                focus:outline-none focus:border-orange-500 focus:shadow-lg"
                                 type="text"
                             />
                         ))}
@@ -133,20 +139,21 @@ function EmailOTPVerify() {
                     <button
                         type="submit"
                         className="w-full bg-orange-600 hover:bg-orange-700 py-3 rounded-xl 
-                        text-lg font-semibold transition shadow-md"
+                        text-lg font-semibold shadow-md transition"
                     >
                         Verify OTP
                     </button>
                 </form>
 
                 <p className="mt-5 text-gray-300">
-                    Didn't get the code?{" "}
+                    Didn’t get the code?{" "}
                     <button
                         disabled={!canResend}
                         onClick={handleResend}
-                        className={`font-semibold 
-                            ${canResend ? "text-orange-400 hover:underline" : "text-gray-500 cursor-not-allowed"}
-                        `}
+                        className={`font-semibold ${canResend
+                                ? "text-orange-400 hover:underline"
+                                : "text-gray-500 cursor-not-allowed"
+                            }`}
                     >
                         {canResend ? "Resend OTP" : `Resend in ${timer}s`}
                     </button>

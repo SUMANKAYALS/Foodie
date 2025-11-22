@@ -16,15 +16,15 @@ const UserSchema = new mongoose.Schema({
     },
     state: {
         type: String,
-        required: true
+        default: ""
     },
     district: {
         type: String,
-        required: true
+        default: ""
     },
     landmark: {
         type: String,
-        required: true
+        default: ""
     },
     // 🟢 Email Verification fields
     isVerified: {

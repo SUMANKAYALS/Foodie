@@ -8,15 +8,17 @@ export const signup = async (req, res) => {
     try {
         const { userName, email, password, state, district, landmark } = req.body;
 
-        // Check if the user already exists
+        console.log("📥 Signup request body:", req.body);
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log("⚠ User already exists:", existingUser);
             return res.status(400).json({ message: "User already exists" });
         }
 
         const otp = generateOtp();
         const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
-        // Create new user
+
         const newUser = new User({
             userName,
             email,
@@ -29,19 +31,20 @@ export const signup = async (req, res) => {
             verificationExpires: otpExpiry
         });
 
-        // Save to database
         const savedUser = await newUser.save();
-        // Send OTP Email
-        await sendEmail(email, "Foodie Email Verification OTP ", otp);
-        return res.status(201).json({
-            message: "send otp",
-        });
+
+        console.log("💾 User saved in DB:", savedUser);
+
+        await sendEmail(email, "Foodie Email Verification OTP", otp);
+
+        return res.status(201).json({ message: "OTP sent" });
 
     } catch (error) {
-        console.log("Error:", error);
+        console.log("❌ Signup Error:", error);
         return res.status(500).json({ message: "Something went wrong ❗" });
     }
 };
+
 
 // export const Login = async (req, res) => {
 //     try {
