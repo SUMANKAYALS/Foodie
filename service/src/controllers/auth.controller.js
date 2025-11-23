@@ -11,9 +11,13 @@ export const signup = async (req, res) => {
         console.log("📥 Signup request body:", req.body);
 
         const existingUser = await User.findOne({ email });
+        // If user already exists → return exists:true (do NOT send OTP)
         if (existingUser) {
             console.log("⚠ User already exists:", existingUser);
-            return res.status(400).json({ message: "User already exists" });
+            return res.status(200).json({
+                message: "User already exists, redirect to login",
+                exists: true
+            });
         }
 
         const otp = generateOtp();

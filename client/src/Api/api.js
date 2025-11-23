@@ -13,7 +13,7 @@ export const signup = async (data) => {
         console.log("API_URL:", API_URL);
 
         const response = await axios.post(
-            `${API_URL}/api/auth/signup`,
+            `${API_URL}/signup`,   // ✔ FIXED
             data,
             {
                 headers: { "Content-Type": "application/json" },
@@ -27,6 +27,7 @@ export const signup = async (data) => {
         throw error;
     }
 };
+
 
 
 

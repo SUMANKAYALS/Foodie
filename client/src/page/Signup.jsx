@@ -27,6 +27,11 @@ function Signup() {
                 landmark
             }
             const result = await signup(data);
+            // If backend says user exists → redirect to login page
+            if (result?.exists) {
+                navigate("/login");
+                return;
+            }
             navigate("/verify-otp", { state: { email } });
         } catch (error) {
             console.error("Registration Error:", error);
